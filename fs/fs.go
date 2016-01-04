@@ -30,26 +30,42 @@ func New() *VaultFS {
 }
 
 // Mount the FS at the given mountpoint
-func (v *VaultFS) Mount(mountpoint string) error {
+func (v *VaultFS) Mount(mountpoint string) (stop func(), errs chan error) {
 	conn, err := fuse.Mount(
 		mountpoint,
 		fuse.FSName("vault"),
 		fuse.VolumeName("vault"),
 	)
+
+	stop = func() {
+		logrus.Info("closing FUSE connection")
+		conn.Close()
+
+		logrus.Debug("closed connection, waiting for ready")
+		<-conn.Ready
+		if conn.MountError != nil {
+			errs <- err
+		}
+		close(errs)
+	}
+	errs = make(chan error, 1)
+
 	logrus.Debug("created conn")
 	if err != nil {
-		return err
+		errs <- err
+		close(errs)
+		return stop, errs
 	}
-	defer conn.Close()
 
 	logrus.Debug("starting to serve")
-	err = fs.Serve(conn, v)
-	if err != nil {
-		return err
-	}
+	go func() {
+		err := fs.Serve(conn, v)
+		if err != nil {
+			errs <- err
+		}
+	}()
 
-	<-conn.Ready
-	return conn.MountError
+	return stop, errs
 }
 
 // Root returns the struct that does the actual work

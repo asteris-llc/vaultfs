@@ -19,6 +19,8 @@ import (
 	"github.com/Sirupsen/logrus"
 	"github.com/asteris-llc/vaultfs/fs"
 	"github.com/spf13/cobra"
+	"os"
+	"os/signal"
 )
 
 // mountCmd represents the mount command
@@ -34,10 +36,25 @@ var mountCmd = &cobra.Command{
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		fs := fs.New()
-		err := fs.Mount(args[0])
-		if err != nil {
-			logrus.WithError(err).Fatal("could not mount")
+		stop, errs := fs.Mount(args[0])
+
+		// handle interrupt
+		go func() {
+			c := make(chan os.Signal, 1)
+			signal.Notify(c, os.Interrupt)
+
+			<-c
+			logrus.Info("stopping")
+			stop()
+		}()
+
+		status := 0
+		for err := range errs {
+			status = 1
+			logrus.WithError(err).Error("error mounting")
 		}
+
+		os.Exit(status)
 	},
 }
 
