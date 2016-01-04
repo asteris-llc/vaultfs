@@ -12,10 +12,30 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package main
+package fs
 
-import "github.com/asteris-llc/vaultfs/cmd"
+import (
+	"bazil.org/fuse"
+	"github.com/Sirupsen/logrus"
+	"golang.org/x/net/context"
+)
 
-func main() {
-	cmd.Execute()
+// Secret implements Node and Handle
+type Secret struct{}
+
+const greeting = "hello, world\n"
+
+// Attr returns attributes about this Secret
+func (Secret) Attr(ctx context.Context, a *fuse.Attr) error {
+	logrus.Debug("handling Secret.Attr call")
+	a.Inode = 2
+	a.Mode = 0444
+	a.Size = uint64(len(greeting))
+	return nil
+}
+
+// ReadAll gets the content of this Secret
+func (Secret) ReadAll(ctx context.Context) ([]byte, error) {
+	logrus.Debug("handling Secret.ReadAll call")
+	return []byte(greeting), nil
 }
