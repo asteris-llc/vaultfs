@@ -18,15 +18,23 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 	"github.com/Sirupsen/logrus"
+	"github.com/hashicorp/vault/api"
 )
 
 // VaultFS is a vault filesystem
-type VaultFS struct{}
+type VaultFS struct {
+	*api.Client
+	root string
+}
 
 // New returns a new VaultFS
-func New() *VaultFS {
-	logrus.Debug("created new FS")
-	return &VaultFS{}
+func New(config *api.Config, root string) (*VaultFS, error) {
+	client, err := api.NewClient(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &VaultFS{client, root}, nil
 }
 
 // Mount the FS at the given mountpoint
@@ -69,7 +77,7 @@ func (v *VaultFS) Mount(mountpoint string) (stop func(), errs chan error) {
 }
 
 // Root returns the struct that does the actual work
-func (VaultFS) Root() (fs.Node, error) {
+func (v *VaultFS) Root() (fs.Node, error) {
 	logrus.Debug("returning root")
-	return Root{}, nil
+	return NewRoot(v.root, v.Logical()), nil
 }

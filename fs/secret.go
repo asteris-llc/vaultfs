@@ -15,27 +15,36 @@
 package fs
 
 import (
+	"encoding/json"
+
 	"bazil.org/fuse"
 	"github.com/Sirupsen/logrus"
+	"github.com/hashicorp/vault/api"
 	"golang.org/x/net/context"
 )
 
 // Secret implements Node and Handle
-type Secret struct{}
-
-const greeting = "hello, world\n"
+type Secret struct {
+	*api.Secret
+	inode uint64
+}
 
 // Attr returns attributes about this Secret
-func (Secret) Attr(ctx context.Context, a *fuse.Attr) error {
-	logrus.Debug("handling Secret.Attr call")
-	a.Inode = 2
+func (s Secret) Attr(ctx context.Context, a *fuse.Attr) error {
+	a.Inode = s.inode
 	a.Mode = 0444
-	a.Size = uint64(len(greeting))
+
+	content, err := s.ReadAll(ctx)
+	if err != nil {
+		logrus.WithError(err).Error("could not determine content length")
+		return fuse.EIO
+	}
+
+	a.Size = uint64(len(content))
 	return nil
 }
 
 // ReadAll gets the content of this Secret
-func (Secret) ReadAll(ctx context.Context) ([]byte, error) {
-	logrus.Debug("handling Secret.ReadAll call")
-	return []byte(greeting), nil
+func (s Secret) ReadAll(ctx context.Context) ([]byte, error) {
+	return json.Marshal(s)
 }

@@ -16,11 +16,16 @@ package cmd
 
 import (
 	"errors"
-	"github.com/Sirupsen/logrus"
-	"github.com/asteris-llc/vaultfs/fs"
-	"github.com/spf13/cobra"
 	"os"
 	"os/signal"
+
+	"crypto/tls"
+	"github.com/Sirupsen/logrus"
+	"github.com/asteris-llc/vaultfs/fs"
+	"github.com/hashicorp/vault/api"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
+	"net/http"
 )
 
 // mountCmd represents the mount command
@@ -35,7 +40,24 @@ var mountCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		fs := fs.New()
+		config := &api.Config{
+			Address: viper.GetString("address"),
+			HttpClient: &http.Client{
+				Transport: &http.Transport{
+					Proxy: http.ProxyFromEnvironment,
+					TLSClientConfig: &tls.Config{
+						InsecureSkipVerify: viper.GetBool("insecure"),
+					},
+				},
+			},
+		}
+
+		logrus.WithField("address", viper.GetString("address")).Info("creating FUSE client for Vault")
+		fs, err := fs.New(config, viper.GetString("root"))
+		if err != nil {
+			logrus.WithError(err).Fatal("error creatinging fs")
+		}
+
 		stop, errs := fs.Mount(args[0])
 
 		// handle interrupt
@@ -61,14 +83,8 @@ var mountCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(mountCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// mountCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// mountCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	mountCmd.Flags().StringP("root", "r", "secret", "root path for reads")
+	mountCmd.Flags().StringP("address", "a", "https://localhost:8200", "vault address")
+	mountCmd.Flags().BoolP("insecure", "i", false, "skip SSL certificate verification")
+	viper.BindPFlags(mountCmd.Flags())
 }
