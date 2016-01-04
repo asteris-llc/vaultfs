@@ -26,7 +26,7 @@ var cfgFile string
 
 // This represents the base command when called without any subcommands
 var RootCmd = &cobra.Command{
-	Use:   "docker-volume-vault",
+	Use:   "vaultfs",
 	Short: "use Docker's volumes to mount Vault secrets",
 	Long:  `use Docker's volumes to mount Vault secrets`,
 	// Uncomment the following line if your bare application
@@ -50,10 +50,13 @@ func init() {
 	// Cobra supports Persistent Flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.docker-volume-vault.yaml)")
+	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is /etc/sysconfig/vaultfs)")
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
 	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+
+	// TODO: add proper log setup
+	logrus.SetLevel(logrus.DebugLevel)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -62,10 +65,10 @@ func initConfig() {
 		viper.SetConfigFile(cfgFile)
 	}
 
-	viper.SetConfigName("docker-volume-vault") // name of config file (without extension)
-	viper.AddConfigPath("$HOME")               // adding home directory as first search path
-	viper.AddConfigPath("/etc/sysconfig")      // linuxes
-	viper.AutomaticEnv()                       // read in environment variables that match
+	viper.SetConfigName("vaultfs")        // name of config file (without extension)
+	viper.AddConfigPath("/etc/sysconfig") // adding sysconfig as the first search path
+	viper.AddConfigPath("$HOME")          // home directory as another path
+	viper.AutomaticEnv()                  // read in environment variables that match
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {

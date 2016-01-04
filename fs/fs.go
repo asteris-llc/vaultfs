@@ -37,6 +37,7 @@ func (v *VaultFS) Mount(mountpoint string) (stop func(), errs chan error) {
 		fuse.VolumeName("vault"),
 	)
 
+	errs = make(chan error, 1)
 	stop = func() {
 		logrus.Info("closing FUSE connection")
 		conn.Close()
@@ -48,7 +49,6 @@ func (v *VaultFS) Mount(mountpoint string) (stop func(), errs chan error) {
 		}
 		close(errs)
 	}
-	errs = make(chan error, 1)
 
 	logrus.Debug("created conn")
 	if err != nil {
