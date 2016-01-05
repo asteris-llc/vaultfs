@@ -44,19 +44,16 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports Persistent Flags, which, if defined here,
-	// will be global for your application.
+	cobra.OnInitialize(initConfig, initLogging)
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is /etc/sysconfig/vaultfs)")
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 
-	// TODO: add proper log setup
-	logrus.SetLevel(logrus.DebugLevel)
+	// logging flags
+	RootCmd.PersistentFlags().String("log-level", "info", "log level (one of fatal, error, warn, info, or debug)")
+	RootCmd.PersistentFlags().String("log-format", "text", "log level (one of text or json)")
+	RootCmd.PersistentFlags().String("log-destination", "stdout:", "log destination (file:/your/output, stdout:, journald:, or syslog://tag@host:port#protocol)")
+
+	viper.BindPFlags(RootCmd.PersistentFlags())
 }
 
 // initConfig reads in config file and ENV variables if set.
