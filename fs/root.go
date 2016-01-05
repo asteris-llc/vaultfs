@@ -19,13 +19,14 @@ import (
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
-	"crypto/sha1"
 	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/vault/api"
 	"golang.org/x/net/context"
-	"io"
+	"hash/crc64"
 	"path"
 )
+
+var table = crc64.MakeTable(crc64.ISO)
 
 // Root implements both Node and Handle
 type Root struct {
@@ -62,14 +63,10 @@ func (r *Root) Lookup(ctx context.Context, name string) (fs.Node, error) {
 		return nil, fuse.EIO
 	}
 
-	hash := sha1.New()
-	io.WriteString(hash, name)
-	inode := uint64(1)
-	for _, d := range hash.Sum(nil) {
-		inode *= uint64(d)
-	}
-
-	return Secret{secret, inode}, nil
+	return Secret{
+		secret,
+		crc64.Checksum([]byte(name), table),
+	}, nil
 }
 
 // ReadDirAll returns nothing, as Vault doesn't allow listing keys
