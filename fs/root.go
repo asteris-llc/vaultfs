@@ -19,30 +19,25 @@ import (
 
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
+	"crypto/sha1"
 	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/vault/api"
 	"golang.org/x/net/context"
+	"io"
 	"path"
-	"sync"
 )
 
 // Root implements both Node and Handle
 type Root struct {
-	root      string
-	logic     *api.Logical
-	m         *sync.Mutex
-	inodes    map[string]uint64
-	nextinode uint64
+	root  string
+	logic *api.Logical
 }
 
 // NewRoot creates a new root and returns it
 func NewRoot(root string, logic *api.Logical) *Root {
 	return &Root{
-		root:      root,
-		logic:     logic,
-		m:         &sync.Mutex{},
-		inodes:    map[string]uint64{},
-		nextinode: 2,
+		root:  root,
+		logic: logic,
 	}
 }
 
@@ -56,7 +51,7 @@ func (Root) Attr(ctx context.Context, a *fuse.Attr) error {
 
 // Lookup looks up a path
 func (r *Root) Lookup(ctx context.Context, name string) (fs.Node, error) {
-	logrus.Debug("handling Root.Lookup call")
+	logrus.WithField("name", name).Debug("handling Root.Lookup call")
 
 	// TODO: handle context cancellation
 	secret, err := r.logic.Read(path.Join(r.root, name))
@@ -67,14 +62,11 @@ func (r *Root) Lookup(ctx context.Context, name string) (fs.Node, error) {
 		return nil, fuse.EIO
 	}
 
-	r.m.Lock()
-	defer r.m.Unlock()
-
-	inode, ok := r.inodes[name]
-	if !ok {
-		inode = r.nextinode
-		r.inodes[name] = inode
-		r.nextinode++
+	hash := sha1.New()
+	io.WriteString(hash, name)
+	inode := uint64(1)
+	for _, d := range hash.Sum(nil) {
+		inode *= uint64(d)
 	}
 
 	return Secret{secret, inode}, nil
