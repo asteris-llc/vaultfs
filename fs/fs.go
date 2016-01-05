@@ -28,11 +28,12 @@ type VaultFS struct {
 }
 
 // New returns a new VaultFS
-func New(config *api.Config, root string) (*VaultFS, error) {
+func New(config *api.Config, token, root string) (*VaultFS, error) {
 	client, err := api.NewClient(config)
 	if err != nil {
 		return nil, err
 	}
+	client.SetToken(token)
 
 	return &VaultFS{client, root}, nil
 }

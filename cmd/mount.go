@@ -53,7 +53,7 @@ var mountCmd = &cobra.Command{
 		}
 
 		logrus.WithField("address", viper.GetString("address")).Info("creating FUSE client for Vault")
-		fs, err := fs.New(config, viper.GetString("root"))
+		fs, err := fs.New(config, viper.GetString("token"), viper.GetString("root"))
 		if err != nil {
 			logrus.WithError(err).Fatal("error creatinging fs")
 		}
@@ -86,5 +86,6 @@ func init() {
 	mountCmd.Flags().StringP("root", "r", "secret", "root path for reads")
 	mountCmd.Flags().StringP("address", "a", "https://localhost:8200", "vault address")
 	mountCmd.Flags().BoolP("insecure", "i", false, "skip SSL certificate verification")
+	mountCmd.Flags().String("token", "", "vault token")
 	viper.BindPFlags(mountCmd.Flags())
 }
