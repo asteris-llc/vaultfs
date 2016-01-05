@@ -20,6 +20,7 @@ import (
 	"github.com/rifflock/lfshook"
 	"github.com/spf13/viper"
 	"github.com/wercker/journalhook"
+	"golang.org/x/sys/unix"
 	"log/syslog"
 	"net/url"
 )
@@ -73,5 +74,18 @@ func initLogging() {
 		}
 	default:
 		logrus.WithField("destination", viper.GetString("log-destination")).Warn(`invalid log destination. Defaulting to "stdout:"`)
+	}
+}
+
+func lockMemory() {
+	err := unix.Mlockall(unix.MCL_FUTURE | unix.MCL_CURRENT)
+	switch err {
+	case nil:
+	case unix.ENOSYS:
+		logrus.WithError(err).Warn("mlockall() not implemented on this system")
+	case unix.ENOMEM:
+		logrus.WithError(err).Warn("mlockall() failed with ENOMEM")
+	default:
+		logrus.WithError(err).Warn("could not perform mlockall to prevent swapping memory")
 	}
 }

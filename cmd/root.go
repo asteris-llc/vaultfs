@@ -41,7 +41,7 @@ func Execute() {
 }
 
 func init() {
-	cobra.OnInitialize(initConfig, initLogging)
+	cobra.OnInitialize(initConfig, initLogging, lockMemory)
 
 	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is /etc/sysconfig/vaultfs)")
 
