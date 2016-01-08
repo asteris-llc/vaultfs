@@ -50,7 +50,9 @@ func init() {
 	RootCmd.PersistentFlags().String("log-format", "text", "log level (one of text or json)")
 	RootCmd.PersistentFlags().String("log-destination", "stdout:", "log destination (file:/your/output, stdout:, journald:, or syslog://tag@host:port#protocol)")
 
-	viper.BindPFlags(RootCmd.PersistentFlags())
+	if err := viper.BindPFlags(RootCmd.PersistentFlags()); err != nil {
+		logrus.WithError(err).Fatal("could not bind flags")
+	}
 }
 
 // initConfig reads in config file and ENV variables if set.

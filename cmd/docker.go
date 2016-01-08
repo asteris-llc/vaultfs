@@ -34,16 +34,25 @@ var dockerCmd = &cobra.Command{
 			return errors.New("expected exactly one argument, a mountpoint")
 		}
 
+		if err := viper.BindPFlags(cmd.Flags()); err != nil {
+			logrus.WithError(err).Fatal("could not bind flags")
+		}
+
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		lockMemory()
-
 		driver := docker.New(docker.Config{
 			Root:  args[0],
 			Token: viper.GetString("token"),
 			Vault: fs.NewConfig(viper.GetString("address"), viper.GetBool("insecure")),
 		})
+
+		logrus.WithFields(logrus.Fields{
+			"root":     args[0],
+			"address":  viper.GetString("address"),
+			"insecure": viper.GetBool("insecure"),
+			"socket":   viper.GetString("socket"),
+		}).Info("starting plugin server")
 
 		defer func() {
 			for _, err := range driver.Stop() {
@@ -67,5 +76,4 @@ func init() {
 	dockerCmd.Flags().BoolP("insecure", "i", false, "skip SSL certificate verification")
 	dockerCmd.Flags().StringP("token", "t", "", "vault token")
 	dockerCmd.Flags().StringP("socket", "s", "/run/docker/plugins/vault.sock", "socket address to communicate with docker")
-	viper.BindPFlags(dockerCmd.Flags())
 }

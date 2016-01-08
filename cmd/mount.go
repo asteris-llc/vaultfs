@@ -34,6 +34,10 @@ var mountCmd = &cobra.Command{
 			return errors.New("expected exactly one argument")
 		}
 
+		if err := viper.BindPFlags(cmd.Flags()); err != nil {
+			logrus.WithError(err).Fatal("could not bind flags")
+		}
+
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
@@ -73,5 +77,4 @@ func init() {
 	mountCmd.Flags().StringP("address", "a", "https://localhost:8200", "vault address")
 	mountCmd.Flags().BoolP("insecure", "i", false, "skip SSL certificate verification")
 	mountCmd.Flags().StringP("token", "t", "", "vault token")
-	viper.BindPFlags(mountCmd.Flags())
 }
