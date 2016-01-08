@@ -68,7 +68,12 @@ func (v *VaultFS) Unmount() error {
 		return errors.New("not mounted")
 	}
 
-	err := v.conn.Close()
+	err := fuse.Unmount(v.mountpoint)
+	if err != nil {
+		return err
+	}
+
+	err = v.conn.Close()
 	if err != nil {
 		return err
 	}
@@ -77,11 +82,6 @@ func (v *VaultFS) Unmount() error {
 	<-v.conn.Ready
 	if v.conn.MountError != nil {
 		return v.conn.MountError
-	}
-
-	err = fuse.Unmount(v.mountpoint)
-	if err != nil {
-		return err
 	}
 
 	return nil
