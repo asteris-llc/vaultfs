@@ -49,9 +49,15 @@ func (d Driver) Remove(r volume.Request) volume.Response {
 	d.m.Lock()
 	defer d.m.Unlock()
 	mount := d.mountpoint(r.Name)
+	logger := logrus.WithFields(logrus.Fields{
+		"name":       r.Name,
+		"mountpoint": mount,
+	})
+	logger.Debug("got remove request")
 
 	if server, ok := d.servers[mount]; ok {
 		if server.connections <= 1 {
+			logger.Debug("removing server")
 			delete(d.servers, mount)
 		}
 	}
@@ -70,10 +76,11 @@ func (d Driver) Mount(r volume.Request) volume.Response {
 	defer d.m.Unlock()
 
 	mount := d.mountpoint(r.Name)
-	logrus.WithFields(logrus.Fields{
+	logger := logrus.WithFields(logrus.Fields{
 		"name":       r.Name,
 		"mountpoint": mount,
-	}).Info("mounting volume")
+	})
+	logger.Info("mounting volume")
 
 	server, ok := d.servers[mount]
 	if ok && server.connections > 0 {
@@ -85,18 +92,22 @@ func (d Driver) Mount(r volume.Request) volume.Response {
 
 	if os.IsNotExist(err) {
 		if err := os.MkdirAll(mount, 0444); err != nil {
+			logger.WithError(err).Error("error making mount directory")
 			return volume.Response{Err: err.Error()}
 		}
 	} else if err != nil {
+		logger.WithError(err).Error("error checking if directory exists")
 		return volume.Response{Err: err.Error()}
 	}
 
 	if mountInfo != nil && !mountInfo.IsDir() {
+		logger.Error("already exists and not a directory")
 		return volume.Response{Err: fmt.Sprintf("%s already exists and is not a directory", mount)}
 	}
 
 	server, err = NewServer(d.config.Vault, mount, d.config.Token, r.Name)
 	if err != nil {
+		logger.WithError(err).Error("error creating server")
 		return volume.Response{Err: err.Error()}
 	}
 
@@ -112,20 +123,25 @@ func (d Driver) Unmount(r volume.Request) volume.Response {
 	defer d.m.Unlock()
 
 	mount := d.mountpoint(r.Name)
-	logrus.WithFields(logrus.Fields{
+	logger := logrus.WithFields(logrus.Fields{
 		"name":       r.Name,
 		"mountpoint": mount,
-	}).Info("unmounting volume")
+	})
+	logger.Info("unmounting volume")
 
 	if server, ok := d.servers[mount]; ok {
+		logger.WithField("conns", server.connections).Debug("found server")
 		if server.connections == 1 {
+			logger.Debug("unmounting")
 			err := server.Unmount()
 			if err != nil {
+				logger.WithError(err).Error("error unmounting server")
 				return volume.Response{Err: err.Error()}
 			}
 			server.connections--
 		}
 	} else {
+		logger.Error("could not find volume")
 		return volume.Response{Err: fmt.Sprintf("unable to find the volume mounted at %s", mount)}
 	}
 
@@ -140,6 +156,7 @@ func (d Driver) mountpoint(name string) string {
 func (d Driver) Stop() []error {
 	d.m.Lock()
 	defer d.m.Unlock()
+	logrus.Debug("got stop request")
 
 	errs := []error{}
 	for _, server := range d.servers {

@@ -66,6 +66,6 @@ func init() {
 	dockerCmd.Flags().StringP("address", "a", "https://localhost:8200", "vault address")
 	dockerCmd.Flags().BoolP("insecure", "i", false, "skip SSL certificate verification")
 	dockerCmd.Flags().StringP("token", "t", "", "vault token")
-	dockerCmd.Flags().StringP("socket", "s", "/usr/share/docker/plugins/vault.sock", "socket address to communicate with docker")
+	dockerCmd.Flags().StringP("socket", "s", "/run/docker/plugins/vault.sock", "socket address to communicate with docker")
 	viper.BindPFlags(dockerCmd.Flags())
 }
