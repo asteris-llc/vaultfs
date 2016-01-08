@@ -91,7 +91,7 @@ func (d Driver) Mount(r volume.Request) volume.Response {
 	mountInfo, err := os.Lstat(mount)
 
 	if os.IsNotExist(err) {
-		if err := os.MkdirAll(mount, 0444); err != nil {
+		if err := os.MkdirAll(mount, os.ModeDir|0444); err != nil {
 			logger.WithError(err).Error("error making mount directory")
 			return volume.Response{Err: err.Error()}
 		}
