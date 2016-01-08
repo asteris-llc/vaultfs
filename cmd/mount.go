@@ -19,13 +19,10 @@ import (
 	"os"
 	"os/signal"
 
-	"crypto/tls"
 	"github.com/Sirupsen/logrus"
 	"github.com/asteris-llc/vaultfs/fs"
-	"github.com/hashicorp/vault/api"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"net/http"
 )
 
 // mountCmd represents the mount command
@@ -40,25 +37,14 @@ var mountCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		config := &api.Config{
-			Address: viper.GetString("address"),
-			HttpClient: &http.Client{
-				Transport: &http.Transport{
-					Proxy: http.ProxyFromEnvironment,
-					TLSClientConfig: &tls.Config{
-						InsecureSkipVerify: viper.GetBool("insecure"),
-					},
-				},
-			},
-		}
+		config := fs.NewConfig(viper.GetString("address"), viper.GetBool("insecure"))
 
 		logrus.WithField("address", viper.GetString("address")).Info("creating FUSE client for Vault")
-		fs, err := fs.New(config, viper.GetString("token"), viper.GetString("root"))
+
+		fs, err := fs.New(config, args[0], viper.GetString("token"), viper.GetString("root"))
 		if err != nil {
 			logrus.WithError(err).Fatal("error creatinging fs")
 		}
-
-		stop, errs := fs.Mount(args[0])
 
 		// handle interrupt
 		go func() {
@@ -67,16 +53,16 @@ var mountCmd = &cobra.Command{
 
 			<-c
 			logrus.Info("stopping")
-			stop()
+			err := fs.Unmount()
+			if err != nil {
+				logrus.WithError(err).Fatal("could not unmount cleanly")
+			}
 		}()
 
-		status := 0
-		for err := range errs {
-			status = 1
-			logrus.WithError(err).Error("error mounting")
+		err = fs.Mount()
+		if err != nil {
+			logrus.WithError(err).Fatal("could not continue")
 		}
-
-		os.Exit(status)
 	},
 }
 

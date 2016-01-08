@@ -17,6 +17,7 @@ package fs
 import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
+	"errors"
 	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/vault/api"
 )
@@ -24,57 +25,66 @@ import (
 // VaultFS is a vault filesystem
 type VaultFS struct {
 	*api.Client
-	root string
+	root       string
+	conn       *fuse.Conn
+	mountpoint string
 }
 
 // New returns a new VaultFS
-func New(config *api.Config, token, root string) (*VaultFS, error) {
+func New(config *api.Config, mountpoint, token, root string) (*VaultFS, error) {
 	client, err := api.NewClient(config)
 	if err != nil {
 		return nil, err
 	}
 	client.SetToken(token)
 
-	return &VaultFS{client, root}, nil
+	return &VaultFS{
+		Client:     client,
+		root:       root,
+		mountpoint: mountpoint,
+	}, nil
 }
 
 // Mount the FS at the given mountpoint
-func (v *VaultFS) Mount(mountpoint string) (stop func(), errs chan error) {
-	conn, err := fuse.Mount(
-		mountpoint,
+func (v *VaultFS) Mount() error {
+	var err error
+	v.conn, err = fuse.Mount(
+		v.mountpoint,
 		fuse.FSName("vault"),
 		fuse.VolumeName("vault"),
 	)
 
-	errs = make(chan error, 1)
-	stop = func() {
-		logrus.Info("closing FUSE connection")
-		conn.Close()
-
-		logrus.Debug("closed connection, waiting for ready")
-		<-conn.Ready
-		if conn.MountError != nil {
-			errs <- err
-		}
-		close(errs)
-	}
-
 	logrus.Debug("created conn")
 	if err != nil {
-		errs <- err
-		close(errs)
-		return stop, errs
+		return err
 	}
 
 	logrus.Debug("starting to serve")
-	go func() {
-		err := fs.Serve(conn, v)
-		if err != nil {
-			errs <- err
-		}
-	}()
+	return fs.Serve(v.conn, v)
+}
 
-	return stop, errs
+func (v *VaultFS) Unmount() error {
+	if v.conn == nil {
+		return errors.New("not mounted")
+	}
+
+	err := v.conn.Close()
+	if err != nil {
+		return err
+	}
+
+	logrus.Debug("closed connection, waiting for ready")
+	<-v.conn.Ready
+	if v.conn.MountError != nil {
+		return v.conn.MountError
+	}
+
+	err = fuse.Unmount(v.mountpoint)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Root returns the struct that does the actual work
