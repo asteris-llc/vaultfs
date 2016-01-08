@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"github.com/Sirupsen/logrus"
 	"github.com/docker/go-plugins-helpers/volume"
+	"net/url"
 	"os"
 	"path"
 	"sync"
@@ -149,7 +150,7 @@ func (d Driver) Unmount(r volume.Request) volume.Response {
 }
 
 func (d Driver) mountpoint(name string) string {
-	return path.Join(d.config.Root, name)
+	return path.Join(d.config.Root, url.QueryEscape(name))
 }
 
 // Stop stops all the servers
