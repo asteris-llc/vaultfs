@@ -69,8 +69,27 @@ func (r *Root) Lookup(ctx context.Context, name string) (fs.Node, error) {
 	}, nil
 }
 
-// ReadDirAll returns nothing, as Vault doesn't allow listing keys
-func (Root) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
+// ReadDirAll returns a list of secrets
+func (r *Root) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	logrus.Debug("handling Root.ReadDirAll call")
-	return []fuse.Dirent{}, fuse.EPERM
+
+	secrets, err := r.logic.List(path.Join(r.root))
+	if err != nil {
+		logrus.WithError(err).WithFields(logrus.Fields{"root": r.root}).Error("error reading secrets")
+	}
+	if secrets.Data["keys"] == nil {
+		return []fuse.Dirent{}, nil
+	}
+
+	dirs := []fuse.Dirent{}
+	for i := 0; i < len(secrets.Data["keys"].([]interface{})); i++ {
+		d := fuse.Dirent{
+			Name:  secrets.Data["keys"].([]interface{})[i].(string),
+			Inode: 1,
+			Type:  fuse.DT_File, // TODO: A lie, consider an alternative
+		}
+		dirs = append(dirs, d)
+	}
+
+	return dirs, nil
 }
