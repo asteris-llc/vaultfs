@@ -17,3 +17,7 @@ script:
   - go get -u github.com/golang/lint/golint
   - golint ./...
   - make test
+
+matrix:
+    allow_failures:
+        - go: tip
