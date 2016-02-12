@@ -15,7 +15,7 @@ env:
 
 script:
   - go get -u github.com/golang/lint/golint
-  - golint ./...
+  - golint $(GO15VENDOREXPERIMENT=1 go list ./... | grep -v /vendor/)
   - make test
 
 matrix:
