@@ -76,7 +76,9 @@ func (r *Root) ReadDirAll(ctx context.Context) ([]fuse.Dirent, error) {
 	secrets, err := r.logic.List(path.Join(r.root))
 	if err != nil {
 		logrus.WithError(err).WithFields(logrus.Fields{"root": r.root}).Error("error reading secrets")
+		return nil, fuse.EIO
 	}
+
 	if secrets.Data["keys"] == nil {
 		return []fuse.Dirent{}, nil
 	}
