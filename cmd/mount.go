@@ -18,6 +18,7 @@ import (
 	"errors"
 	"os"
 	"os/signal"
+	"syscall"
 
 	"github.com/Sirupsen/logrus"
 	"github.com/asteris-llc/vaultfs/fs"
@@ -53,7 +54,7 @@ var mountCmd = &cobra.Command{
 		// handle interrupt
 		go func() {
 			c := make(chan os.Signal, 1)
-			signal.Notify(c, os.Interrupt)
+			signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 
 			<-c
 			logrus.Info("stopping")
