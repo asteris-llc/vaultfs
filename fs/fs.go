@@ -15,9 +15,10 @@
 package fs
 
 import (
+	"errors"
+
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
-	"errors"
 	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/vault/api"
 )
@@ -63,6 +64,7 @@ func (v *VaultFS) Mount() error {
 	return fs.Serve(v.conn, v)
 }
 
+// Unmount the FS
 func (v *VaultFS) Unmount() error {
 	if v.conn == nil {
 		return errors.New("not mounted")

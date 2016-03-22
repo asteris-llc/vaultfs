@@ -24,7 +24,7 @@ import (
 
 var cfgFile string
 
-// This represents the base command when called without any subcommands
+// RootCmd controls global settings
 var RootCmd = &cobra.Command{
 	Use:   "vaultfs",
 	Short: "use Docker's volumes to mount Vault secrets",

@@ -17,13 +17,14 @@ package fs
 import (
 	"os"
 
+	"hash/crc64"
+	"path"
+
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/vault/api"
 	"golang.org/x/net/context"
-	"hash/crc64"
-	"path"
 )
 
 var table = crc64.MakeTable(crc64.ISO)

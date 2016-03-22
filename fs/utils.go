@@ -16,8 +16,9 @@ package fs
 
 import (
 	"crypto/tls"
-	"github.com/hashicorp/vault/api"
 	"net/http"
+
+	"github.com/hashicorp/vault/api"
 )
 
 // NewConfig creates a new config

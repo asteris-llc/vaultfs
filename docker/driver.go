@@ -16,12 +16,13 @@ package docker
 
 import (
 	"fmt"
-	"github.com/Sirupsen/logrus"
-	"github.com/docker/go-plugins-helpers/volume"
 	"net/url"
 	"os"
 	"path"
 	"sync"
+
+	"github.com/Sirupsen/logrus"
+	"github.com/docker/go-plugins-helpers/volume"
 )
 
 type volumeName struct {
@@ -51,6 +52,7 @@ func (d Driver) Create(r volume.Request) volume.Response {
 	return volume.Response{}
 }
 
+// Get retrieves a volume
 func (d Driver) Get(r volume.Request) volume.Response {
 	d.m.Lock()
 	defer d.m.Unlock()
@@ -62,6 +64,7 @@ func (d Driver) Get(r volume.Request) volume.Response {
 	return volume.Response{Err: fmt.Sprintf("Unable to find volume mounted on %s", m)}
 }
 
+// List mounted volumes
 func (d Driver) List(r volume.Request) volume.Response {
 	d.m.Lock()
 	defer d.m.Unlock()

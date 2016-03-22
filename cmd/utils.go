@@ -15,14 +15,15 @@
 package cmd
 
 import (
+	"log/syslog"
+	"net/url"
+
 	"github.com/Sirupsen/logrus"
 	logrus_syslog "github.com/Sirupsen/logrus/hooks/syslog"
 	"github.com/rifflock/lfshook"
 	"github.com/spf13/viper"
 	"github.com/wercker/journalhook"
 	"golang.org/x/sys/unix"
-	"log/syslog"
-	"net/url"
 )
 
 func initLogging() {
