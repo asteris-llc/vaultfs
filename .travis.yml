@@ -7,17 +7,15 @@ go:
   - 1.6
   - tip
 
-install:
-      - echo noop
-
 env:
   - "PATH=/home/travis/gopath/bin:$PATH"
 
+install:
+  - echo noop
+
 script:
-  - go get -u github.com/golang/lint/golint
-  - golint $(GO15VENDOREXPERIMENT=1 go list ./... | grep -v /vendor/)
-  - make test
+  - make
 
 matrix:
-    allow_failures:
-        - go: tip
+  allow_failures:
+    - go: tip
