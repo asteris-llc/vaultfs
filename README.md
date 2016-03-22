@@ -1,5 +1,7 @@
 # VaultFS
 
+[![Build Status](https://travis-ci.org/asteris-llc/vaultfs.svg?branch=master)](https://travis-ci.org/asteris-llc/vaultfs)
+
 VaultFS mounts arbitrary [Vault](https://vaultproject.io/) prefixes in a FUSE
 filesystem. It also provides a Docker volume plugin to the do the same for your
 containers.
