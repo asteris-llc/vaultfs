@@ -7,12 +7,11 @@ go:
   - 1.6
   - tip
 
-env:
-  - "PATH=/home/travis/gopath/bin:$PATH"
-
 install:
-  - curl -L https://github.com/Masterminds/glide/releases/download/0.9.3/glide-0.9.3-linux-amd64.tar.gz | tar -xzv --strip-components=1 -C /usr/local/bin
-  - chmod +x /usr/local/bin
+  - mkdir tools
+  - curl -L https://github.com/Masterminds/glide/releases/download/0.9.3/glide-0.9.3-linux-amd64.tar.gz | tar -xzv --strip-components=1 -C tools
+  - chmod +x tools/glide
+  - export PATH=$(pwd)/tools:$PATH
   - glide install
 
 script:
