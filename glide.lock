@@ -1,5 +1,5 @@
 hash: a01b3e73bc4dfb399afff3e28a542d0849eee2f7e627fd8264e862b857a9effd
-updated: 2016-03-22T13:43:16.899166275-05:00
+updated: 2016-03-22T18:40:46.722947065-05:00
 imports:
 - name: bazil.org/fuse
   version: 37bfa8be929171feec943f3496bc4befdeaf10db
@@ -15,7 +15,7 @@ imports:
   - activation
   - util
 - name: github.com/docker/docker
-  version: 62d45566544344b6f562bff7792976702ed8938b
+  version: 506fb9810c60177b360b9dabab516828b90ffc48
   subpackages:
   - volume
   - pkg/system
@@ -66,7 +66,7 @@ imports:
 - name: github.com/mitchellh/mapstructure
   version: d2dd0262208475919e1a362f675cfc0e7c10e905
 - name: github.com/opencontainers/runc
-  version: a35f90798372b6915ceecfcb891da6bd82299a79
+  version: 5f182ce7380f41b8c60a2ecaec14996d7e9cfd4a
   subpackages:
   - libcontainer/user
 - name: github.com/rifflock/lfshook
@@ -93,7 +93,7 @@ imports:
   - context
   - proxy
 - name: golang.org/x/sys
-  version: 9d4e42a20653790449273b3c85e67d6d8bae6e2e
+  version: afce3de5756ca82699128ebae46ac95ad59d6297
   subpackages:
   - unix
 - name: gopkg.in/fsnotify.v1
