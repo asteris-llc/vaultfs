@@ -1,0 +1,24 @@
+package: github.com/asteris-llc/vaultfs
+import:
+- package: bazil.org/fuse
+  subpackages:
+  - fs
+- package: github.com/Sirupsen/logrus
+  subpackages:
+  - hooks/syslog
+- package: github.com/docker/go-plugins-helpers
+  subpackages:
+  - volume
+- package: github.com/hashicorp/vault
+  subpackages:
+  - api
+- package: github.com/rifflock/lfshook
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
+- package: github.com/wercker/journalhook
+- package: golang.org/x/net
+  subpackages:
+  - context
+- package: golang.org/x/sys
+  subpackages:
+  - unix
