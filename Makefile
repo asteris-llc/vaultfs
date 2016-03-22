@@ -54,7 +54,7 @@ lint:
 	fi
 
 fmt:
-	gofmt -w .
+	gofmt -w $(shell echo $(TEST) | sed 's/\.\.\./*.go/g' | sed 's/\.\//.\/*.go/')
 
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
