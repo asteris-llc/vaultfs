@@ -3,13 +3,12 @@ VET?=$(shell echo ${TEST} | sed "s/\.\.\.//g" | sed "s/\.\/ //g")
 VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods -nilfunc -printf -rangeloops -shift -structtags -unsafeptr
 
 all: test vaultfs
-	GO15VENDOREXPERIMENT=1 go install $(TEST) -timeout=30s -parallel=4
 
-vaultfs: fmtcheck generate
-	GO15VENDOREXPERIMENT=1 go build $(TEST)
+vaultfs:
+	GO15VENDOREXPERIMENT=1 go build .
 
-install: fmtcheck generate
-	GO15VENDOREXPERIMENT=1 go install $(TEST)
+install: fmtcheck
+	GO15VENDOREXPERIMENT=1 go install .
 
 # test runs the unit tests and vets the code
 test: fmtcheck vet lint
@@ -17,7 +16,7 @@ test: fmtcheck vet lint
 	GO15VENDOREXPERIMENT=1 go test $(TEST) $(TESTARGS) -timeout=30s -parallel=4
 
 # testrace runs the race checker
-testrace: fmtcheck generate
+testrace: fmtcheck
 	GO15VENDOREXPERIMENT=1 go test -race $(TEST) $(TESTARGS)
 
 cover:
@@ -59,4 +58,4 @@ fmt:
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
 
-.PHONY: all generate test updatedeps vet fmt fmtcheck
+.PHONY: all test vet fmt fmtcheck lint
