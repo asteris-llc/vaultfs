@@ -24,10 +24,16 @@ import (
 	"sync"
 )
 
+type volumeName struct {
+	name        string
+	connections int
+}
+
 // Driver implements the interface for a Docker volume plugin
 type Driver struct {
 	config  Config
 	servers map[string]*Server
+	volumes map[string]*volumeName
 	m       *sync.Mutex
 }
 
@@ -43,6 +49,27 @@ func New(config Config) Driver {
 // Create handles volume creation calls
 func (d Driver) Create(r volume.Request) volume.Response {
 	return volume.Response{}
+}
+
+func (d Driver) Get(r volume.Request) volume.Response {
+	d.m.Lock()
+	defer d.m.Unlock()
+	m := d.mountpoint(r.Name)
+	if s, ok := d.volumes[m]; ok {
+		return volume.Response{Volume: &volume.Volume{Name: s.name, Mountpoint: d.mountpoint(s.name)}}
+	}
+
+	return volume.Response{Err: fmt.Sprintf("Unable to find volume mounted on %s", m)}
+}
+
+func (d Driver) List(r volume.Request) volume.Response {
+	d.m.Lock()
+	defer d.m.Unlock()
+	var vols []*volume.Volume
+	for _, v := range d.volumes {
+		vols = append(vols, &volume.Volume{Name: v.name, Mountpoint: d.mountpoint(v.name)})
+	}
+	return volume.Response{Volumes: vols}
 }
 
 // Remove handles volume removal calls
