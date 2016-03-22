@@ -1,6 +1,8 @@
 TEST?=$(shell GO15VENDOREXPERIMENT=1 go list -f '{{.ImportPath}}/...' ./... | grep -v /vendor/ | sed "s|$(shell go list -f '{{.ImportPath}}' .)|.|g" | sed "s/\.\/\.\.\./\.\//g")
 VET?=$(shell echo ${TEST} | sed "s/\.\.\.//g" | sed "s/\.\/ //g")
 VETARGS?=-asmdecl -atomic -bool -buildtags -copylocks -methods -nilfunc -printf -rangeloops -shift -structtags -unsafeptr
+NAME=$(shell awk -F\" '/^const Name/ { print $$2 }' cmd/version.go)
+VERSION=$(shell awk -F\" '/^const Version/ { print $$2 }' cmd/version.go)
 
 all: test vaultfs
 
@@ -57,5 +59,26 @@ fmt:
 
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
+
+xcompile: test
+	@rm -rf build/
+	@mkdir -p build
+	gox \
+		-os="darwin" \
+		-os="dragonfly" \
+		-os="freebsd" \
+		-os="linux" \
+		-os="openbsd" \
+		-os="solaris" \
+		-os="windows" \
+		-output="build/{{.Dir}}_$(VERSION)_{{.OS}}_{{.Arch}}/$(NAME)"
+
+package: xcompile
+	$(eval FILES := $(shell ls build))
+	@mkdir -p build/tgz
+	for f in $(FILES); do \
+		(cd $(shell pwd)/build && tar -zcvf tgz/$$f.tar.gz $$f); \
+		echo $$f; \
+	done
 
 .PHONY: all test vet fmt fmtcheck lint
