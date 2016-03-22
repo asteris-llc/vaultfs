@@ -1,0 +1,23 @@
+---
+language: go
+
+# we support the most two recent releases, and (hopefully) the tip.
+go:
+  - 1.5
+  - 1.6
+  - tip
+
+install:
+      - echo noop
+
+env:
+  - "PATH=/home/travis/gopath/bin:$PATH"
+
+script:
+  - go get -u github.com/golang/lint/golint
+  - golint $(GO15VENDOREXPERIMENT=1 go list ./... | grep -v /vendor/)
+  - make test
+
+matrix:
+    allow_failures:
+        - go: tip
