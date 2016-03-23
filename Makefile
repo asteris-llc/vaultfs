@@ -60,25 +60,4 @@ fmt:
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
 
-xcompile: test
-	@rm -rf build/
-	@mkdir -p build
-	gox \
-		-os="darwin" \
-		-os="dragonfly" \
-		-os="freebsd" \
-		-os="linux" \
-		-os="openbsd" \
-		-os="solaris" \
-		-os="windows" \
-		-output="build/{{.Dir}}_$(VERSION)_{{.OS}}_{{.Arch}}/$(NAME)"
-
-package: xcompile
-	$(eval FILES := $(shell ls build))
-	@mkdir -p build/tgz
-	for f in $(FILES); do \
-		(cd $(shell pwd)/build && tar -zcvf tgz/$$f.tar.gz $$f); \
-		echo $$f; \
-	done
-
 .PHONY: all test vet fmt fmtcheck lint
