@@ -1,5 +1,5 @@
 hash: a01b3e73bc4dfb399afff3e28a542d0849eee2f7e627fd8264e862b857a9effd
-updated: 2016-03-22T18:40:46.722947065-05:00
+updated: 2016-03-23T11:20:53.432700723-05:00
 imports:
 - name: bazil.org/fuse
   version: 37bfa8be929171feec943f3496bc4befdeaf10db
@@ -15,7 +15,7 @@ imports:
   - activation
   - util
 - name: github.com/docker/docker
-  version: 506fb9810c60177b360b9dabab516828b90ffc48
+  version: f4dfe15cbedd00668d1ad6fe26544cfb814f35ea
   subpackages:
   - volume
   - pkg/system
@@ -50,7 +50,7 @@ imports:
   - json/scanner
   - json/token
 - name: github.com/hashicorp/vault
-  version: c22fc374b6f63cb5b1fd7bd2036ff47df95f7691
+  version: 8f54fac90033bb44f50c16afb39c4b968b6a6d32
   subpackages:
   - api
 - name: github.com/inconshreveable/mousetrap
