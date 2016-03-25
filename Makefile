@@ -60,4 +60,12 @@ fmt:
 fmtcheck:
 	@sh -c "'$(CURDIR)/scripts/gofmtcheck.sh'"
 
+vaultfs-%-linux-amd64.tar.gz: test
+	./release/build.sh
+	mkdir vaultfs-$*-linux-amd64
+	mv vaultfs vaultfs-$*-linux-amd64/vaultfs
+	cp README.md LICENSE vaultfs-$*-linux-amd64/
+	tar -czvf $@ vaultfs-$*-linux-amd64
+	rm -rf vaultfs-$*-linux-amd64
+
 .PHONY: all test vet fmt fmtcheck lint
