@@ -75,6 +75,11 @@ func (d Driver) List(r volume.Request) volume.Response {
 	return volume.Response{Volumes: vols}
 }
 
+// Capabilities tells Docker that data is stored locally
+func (d Driver) Capabilities(r volume.Request) volume.Response {
+	return volume.Response{Capabilities: volume.Capability{Scope: "local"}}
+}
+
 // Remove handles volume removal calls
 func (d Driver) Remove(r volume.Request) volume.Response {
 	d.m.Lock()
