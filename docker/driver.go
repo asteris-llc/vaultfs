@@ -48,6 +48,15 @@ func New(config Config) Driver {
 }
 
 // Create handles volume creation calls
+func (d Driver) Capabilities(r volume.Request) volume.Response {
+	return volume.Response{
+		Capabilities: volume.Capability{
+			Scope: "local",
+		},
+	}
+}
+
+// Create handles volume creation calls
 func (d Driver) Create(r volume.Request) volume.Response {
 	return volume.Response{}
 }
@@ -102,7 +111,7 @@ func (d Driver) Path(r volume.Request) volume.Response {
 }
 
 // Mount handles creating and mounting servers
-func (d Driver) Mount(r volume.Request) volume.Response {
+func (d Driver) Mount(r volume.MountRequest) volume.Response {
 	d.m.Lock()
 	defer d.m.Unlock()
 
@@ -149,7 +158,7 @@ func (d Driver) Mount(r volume.Request) volume.Response {
 }
 
 // Unmount handles unmounting (but not removing) servers
-func (d Driver) Unmount(r volume.Request) volume.Response {
+func (d Driver) Unmount(r volume.UnmountRequest) volume.Response {
 	d.m.Lock()
 	defer d.m.Unlock()
 
