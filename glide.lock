@@ -1,45 +1,46 @@
-hash: a01b3e73bc4dfb399afff3e28a542d0849eee2f7e627fd8264e862b857a9effd
-updated: 2016-03-23T11:20:53.432700723-05:00
+hash: 787a5e012ebcf4cedada6a62f663598549a7ccbee80a1f9344b985fd17a08d03
+updated: 2016-11-29T11:04:38.526901952+11:00
 imports:
+- name: .
+  version: ""
 - name: bazil.org/fuse
-  version: 37bfa8be929171feec943f3496bc4befdeaf10db
+  version: 371fbbdaa8987b715bdd21d6adc4c9b20155f748
   subpackages:
   - fs
   - fuseutil
-- name: github.com/BurntSushi/toml
-  version: bbd5bb678321a0d6e58f1099321dfa73391c1b6f
 - name: github.com/coreos/go-systemd
-  version: 7b2428fec40033549c68f54e26e89e7ca9a9ce31
+  version: efa0506b99d3d9cfade280f5c7a1c1980d8c6c48
   subpackages:
   - journal
   - activation
   - util
-- name: github.com/docker/docker
-  version: f4dfe15cbedd00668d1ad6fe26544cfb814f35ea
+- name: github.com/coreos/pkg
+  version: 447b7ec906e523386d9c53be15b55a8ae86ea944
   subpackages:
-  - volume
-  - pkg/system
+  - dlopen
 - name: github.com/docker/go-connections
-  version: f549a9393d05688dff0992ef3efd8bbe6c628aeb
+  version: 4ccf312bf1d35e5dbda654e57a9be4c3f3cd0366
   subpackages:
   - sockets
 - name: github.com/docker/go-plugins-helpers
-  version: 7945ace0aa5cd39b512c5f3cf30ef6e55f5cc0fc
+  version: 77bfeec724ac5ae33f6a820c7ee6c98301b5a121
   subpackages:
   - volume
   - sdk
-- name: github.com/docker/go-units
-  version: 5d2041e26a699eaca682e2ea41c8f891e1060444
 - name: github.com/fatih/structs
-  version: 12ff68a6f48a1c8bd118316171545683337655df
+  version: dc3312cb1a4513a366c4c9e622ad55c32df12ed3
+- name: github.com/fsnotify/fsnotify
+  version: fd9ec7deca8bf46ecd2a795baaacf2b3a9be1197
 - name: github.com/hashicorp/errwrap
   version: 7554cd9344cec97297fa6649b055a8c98c2a1e55
 - name: github.com/hashicorp/go-cleanhttp
-  version: 875fb671b3ddc66f8e2f0acc33829c8cb989a38d
+  version: ad28ea4487f05916463e2423a55166280e8254b5
 - name: github.com/hashicorp/go-multierror
-  version: d30f09973e19c1dfcd120b2d9c4f168e68d6b5d5
+  version: 8484912a3b9987857bac52e0c5fec2b95f419628
+- name: github.com/hashicorp/go-rootcerts
+  version: 6bb64b370b90e7ef1fa532be9e591a81c3493e00
 - name: github.com/hashicorp/hcl
-  version: 5b00661d055d07495c9e785198f607c1fb93061e
+  version: 7cb7455c285ca3bf3362aa4ba6a06a6d6f5c3ba0
   subpackages:
   - hcl/ast
   - hcl/parser
@@ -50,54 +51,68 @@ imports:
   - json/scanner
   - json/token
 - name: github.com/hashicorp/vault
-  version: 8f54fac90033bb44f50c16afb39c4b968b6a6d32
+  version: 4e4693e5deb3d16b6563fb559da500d124e70c71
   subpackages:
   - api
+  - helper/jsonutil
+  - helper/compressutil
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
-- name: github.com/kr/pretty
-  version: e6ac2fc51e89a3249e82157fa0bb7a18ef9dd5bb
-- name: github.com/kr/text
-  version: bb797dc4fb8320488f47bf11de07a733d7233e1f
 - name: github.com/magiconair/properties
-  version: c265cfa48dda6474e208715ca93e987829f572f8
+  version: 9c47895dc1ce54302908ab8a43385d1f5df2c11c
 - name: github.com/Microsoft/go-winio
-  version: 8f9387ea7efabb228a981b9c381142be7667967f
+  version: 24a3e3d3fc7451805e09d11e11e95d9a0a4f205e
+- name: github.com/mitchellh/go-homedir
+  version: 756f7b183b7ab78acdbbee5c7f392838ed459dda
 - name: github.com/mitchellh/mapstructure
-  version: d2dd0262208475919e1a362f675cfc0e7c10e905
+  version: f3009df150dadf309fdee4a54ed65c124afad715
 - name: github.com/opencontainers/runc
-  version: 5f182ce7380f41b8c60a2ecaec14996d7e9cfd4a
+  version: f156f73c2aab1b735df23c9323c976ad5dca1d78
   subpackages:
   - libcontainer/user
+- name: github.com/pelletier/go-buffruneio
+  version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
+- name: github.com/pelletier/go-toml
+  version: 7cb988051d5045890cb91402a0b5fddc76c627bc
 - name: github.com/rifflock/lfshook
-  version: 05a24e24fa8d3a2eca8c2baf23aa2d5a2c51490c
+  version: 3f9d976bd7402de39b46357069fb6325a974572e
+- name: github.com/sethgrid/pester
+  version: 2a102734c18c43c74fd0664e06cd414cf9602b93
 - name: github.com/Sirupsen/logrus
-  version: 4b6ea7319e214d98c938f12692336f7ca9348d6b
+  version: e400ff7861bce9661cf37c162ce3b7b303baf333
   subpackages:
   - hooks/syslog
+- name: github.com/spf13/afero
+  version: 06b7e5f50606ecd49148a01a6008942d9b669217
+  subpackages:
+  - mem
 - name: github.com/spf13/cast
-  version: 27b586b42e29bec072fe7379259cc719e1289da6
+  version: 24b6558033ffe202bf42f0f3b870dcc798dd2ba8
 - name: github.com/spf13/cobra
-  version: c678ff029ee250b65714e518f4f5c5cb934955de
+  version: 9495bc009a56819bdb0ddbc1a373e29c140bc674
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
-  version: 7f60f83a2c81bc3c3c0d5297f61ddfa68da9d3b7
+  version: 5ccb023bc27df288a957c5e994cd44fd19619465
 - name: github.com/spf13/viper
-  version: c975dc1b4eacf4ec7fdbf0873638de5d090ba323
+  version: 651d9d916abc3c3d6a91a12549495caba5edffd2
 - name: github.com/wercker/journalhook
-  version: 1572873fdb03095c0f4d726eb9435f0b564a7e9c
+  version: 77fe873a00e76086d9bf745cfbaecce922ade9d6
 - name: golang.org/x/net
-  version: e7da8edaa52631091740908acaf2c2d4c9b3ce90
+  version: 4971afdc2f162e82d185353533d3cf16188a9f4e
   subpackages:
   - context
   - proxy
 - name: golang.org/x/sys
-  version: afce3de5756ca82699128ebae46ac95ad59d6297
+  version: 30237cf4eefd639b184d1f2cb77a581ea0be8947
   subpackages:
   - unix
-- name: gopkg.in/fsnotify.v1
-  version: 875cf421b32f8f1b31bd43776297876d01542279
+  - windows
+- name: golang.org/x/text
+  version: b01949dc0793a9af5e4cb3fce4d42999e76e8ca1
+  subpackages:
+  - transform
+  - unicode/norm
 - name: gopkg.in/yaml.v2
-  version: a83829b6f1293c91addabc89d0571c246397bbf4
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
 devImports: []

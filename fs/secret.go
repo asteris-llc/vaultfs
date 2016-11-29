@@ -16,23 +16,36 @@ package fs
 
 import (
 	"encoding/json"
+	"os"
 
 	"bazil.org/fuse"
 	"github.com/Sirupsen/logrus"
 	"github.com/hashicorp/vault/api"
 	"golang.org/x/net/context"
+	"bazil.org/fuse/fs"
+"io"
 )
+
+// Statically ensure that *file implements the given interface
+var _ = fs.HandleReader(&Secret{})
+var _ = fs.HandleReleaser(&Secret{})
 
 // Secret implements Node and Handle
 type Secret struct {
 	*api.Secret
+	logic *api.Logical
 	inode uint64
+	lookupPath string
+}
+
+func (s Secret) Release(ctx context.Context, req *fuse.ReleaseRequest) error {
+	return nil
 }
 
 // Attr returns attributes about this Secret
 func (s Secret) Attr(ctx context.Context, a *fuse.Attr) error {
 	a.Inode = s.inode
-	a.Mode = 0444
+	a.Mode = os.FileMode(0444)
 
 	content, err := s.ReadAll(ctx)
 	if err != nil {
@@ -44,7 +57,21 @@ func (s Secret) Attr(ctx context.Context, a *fuse.Attr) error {
 	return nil
 }
 
+func (s Secret) Read(ctx context.Context, req *fuse.ReadRequest, resp *fuse.ReadResponse) error {
+	data, err := s.ReadAll(ctx)
+	if err == io.ErrUnexpectedEOF || err == io.EOF {
+		err = nil
+	}
+	resp.Data = data[:len(data)]
+	return err
+}
+
 // ReadAll gets the content of this Secret
 func (s Secret) ReadAll(ctx context.Context) ([]byte, error) {
-	return json.Marshal(s)
+	data, err := json.Marshal(s)
+	if err != nil {
+		logrus.Errorln("Error marshalling secret:", err)
+	}
+	return data, err
 }
+
